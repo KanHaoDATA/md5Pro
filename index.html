@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tool</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Orbitron', sans-serif;
+      background: url('https://tophinhanhdep.com/wp-content/uploads/2021/11/Neon-City-Cyberpunk-Wallpapers-1.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    * { box-sizing: border-box; }
+
+    .container, .auth-container, .start-container {
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid #00fff2;
+      border-radius: 15px;
+      padding: 30px 40px;
+      box-shadow: 0 0 20px #00fff2;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      display: none;
+    }
+
+    input {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 15px 40px;
+      background-color: #00fff2;
+      color: black;
+      font-weight: bold;
+      font-size: 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00fff2;
+      width: 100%;
+    }
+
+    #result {
+      margin-top: 30px;
+      font-size: 28px;
+      color: yellow;
+      text-shadow: 0 0 10px yellow;
+    }
+
+    #timeLeft {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #00fff2;
+    }
+
+    #loadingScreen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      color: #00fff2;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 999;
+      animation: fadeOut 1s ease 2.5s forwards;
+    }
+
+    #loadingScreen img {
+      width: 100px;
+      margin-bottom: 20px;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+  </style>
+</head>
+
+<body oncontextmenu="return false" onkeydown="return blockKeys(event)">
+  <audio id="welcomeAudio" src="https://cdn.pixabay.com/download/audio/2023/03/12/audio_6e92ce409a.mp3?filename=chao-mung-den-voi-duy-bao-122893.mp3" preload="auto"></audio>
+
+  <div id="loadingScreen">
+    <div>Đang khởi động...</div>
+  </div>
+
+  <div class="start-container" id="startScreen">
+    <button onclick="startApp()">BẮT ĐẦU</button>
+  </div>
+
+  <div class="auth-container" id="authSection">
+    <h1>Nhập KEY !</h1>
+    <input type="password" id="keyInput" placeholder=" " /><br />
+    <button onclick="checkKey()">Check</button>
+    <div id="authResult" style="color:red; margin-top:15px;"></div>
+  </div>
+
+  <div class="container" id="mainApp">
+    <h1> <br>t.me/KanHaoDATA</h1>
+    <input type="text" id="md5Input" placeholder="Nhập mã MD5..." /><br />
+    <button onclick="predict()">Check mã</button>
+    <div id="result"> </div>
+    <div id="timeLeft"></div>
+  </div>
+
+  <script>
+    const keyVinhVien = "keyVinhVien"; // Định nghĩa key vĩnh viễn
+    const keyTheoNgay = {
+      "key1ngayhihi": 1,
+      "KanHao1Tuanhehe ": 7,
+      "KanHao1thanghuhu": 30,
+    };
+    let keyExpirationDate = null;
+
+    window.onload = function () {
+      setTimeout(() => {
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('startScreen').style.display = 'block';
+      }, 2500);
+    };
+
+    function startApp() {
+      document.getElementById('startScreen').style.display = 'none';
+      document.getElementById('authSection').style.display = 'block';
+      document.getElementById('welcomeAudio').play();
+    }
+
+    function checkKey() {
+      const inputKey = document.getElementById('keyInput').value.trim();
+      const authResult = document.getElementById('authResult');
+      const now = new Date();
+      let expireDate = new Date();
+
+      // Kiểm tra key vĩnh viễn
+      if (inputKey === keyVinhVien) {
+        keyExpirationDate = null; // Key vĩnh viễn không có ngày hết hạn
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        startCountdown(); // Gọi hàm đếm ngược (thậm chí không có thời gian hết hạn)
+        return;
+      }
+
+      if (inputKey === key10Phut) {
+        expireDate.setMinutes(expireDate.getMinutes() + 10);
+      } else if (keyTheoNgay[inputKey]) {
+        expireDate.setDate(expireDate.getDate() + keyTheoNgay[inputKey]);
+      } else {
+        authResult.textContent = 'Key không hợp lệ!';
+        return;
+      }
+
+      keyExpirationDate = expireDate;
+
+      document.getElementById('authSection').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
+      startCountdown();
+    }
+
+    function startCountdown() {
+      const timeDisplay = document.getElementById('timeLeft');
+      const interval = setInterval(() => {
+        if (keyExpirationDate === null) {
+          timeDisplay.textContent = "Key vĩnh viễn 300k";
+          return; // Nếu là key vĩnh viễn, không cần đếm ngược thời gian
+        }
+
+        const now = new Date();
+        const timeLeft = keyExpirationDate - now;
+
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          alert("Key đã hết hạn. Vui lòng nhập lại!");
+          location.reload();
+        } else {
+          const hours = Math.floor((timeLeft / 1000 / 60 / 60));
+          const minutes = Math.floor((timeLeft / 1000 / 60) % 60);
+          const seconds = Math.floor((timeLeft / 1000) % 60);
+          const display = `${hours.toString().padStart(2, '0')}:${minutes
+            .toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+          timeDisplay.textContent = `Còn lại: ${display}`;
+        }
+      }, 1000);
+    }
+
+    function predict() {
+      const md5 = document.getElementById('md5Input').value.trim();
+      if (!md5) {
+        document.getElementById('result').textContent = 'Vui lòng nhập mã MD5!';
+        return;
+      }
+      const even = '02468ace';
+      const lastChar = md5.slice(-1).toLowerCase();
+      const ketQua = even.includes(lastChar) ? '𝐓' : '𝐗';
+      document.getElementById('result').textContent = ketQua;
+    }
+
+    function blockKeys(e) {
+      const blocked = ['F12', 'I', 'U'];
+      if ((e.ctrlKey && blocked.includes(e.key.toUpperCase())) || e.key === 'F12') {
+        e.preventDefault();
+        return false;
+      }
+    }
+  </script>
+</body>
+</html>
